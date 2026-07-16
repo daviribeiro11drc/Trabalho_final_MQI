@@ -9,38 +9,429 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-**Trabalho Final de Métodos Quantitativos e Técnicas de Pesquisa em Ciência Política I**
+# **Trabalho Final de Métodos Quantitativos e Técnicas de Pesquisa em Ciência Política I**
 
 **Davi Ribeiro de Camargo - 12507199 - Pós-Graduação**
 
-**INSTRUÇÕES INICIAIS**
+# **INSTRUÇÕES INICIAIS**
+
 
 Para a realização do trabalho, foi criado um repositório no GitHub, que pode ser consultado em: https://github.com/daviribeiro11drc/Trabalho_final_MQI.git
 
 Executei os códigos sugeridos para utilização dos pacotes:
 
+```{r, eval=FALSE}
 library(readxl)
 library(dplyr)
 library(ggplot2)
+```
+
+Baixei a base de dados "BASE_cargos2.xlsx" a partir do link: https://raw.githubusercontent.com/nayalbrecht/burocraciaBR/main/BASE_cargos2.xlsx
+O link foi acessado em 14/07/2027.
+
+Adicionei a base de dados na pasta do repositório criado para o projeto.
 
 Por fim, transformei a aba "BASE_cargos" do banco de dados no objeto "dados":
 
+```{r, eval=FALSE}
 dados <- read_excel("BASE_cargos2.xlsx", sheet = "BASE_cargos")
+```
 
-**PERGUNTAS OBRIGATÓRIAS**
+# **PERGUNTAS OBRIGATÓRIAS**
 
-**1. Artigo, pergunta e unidade de análise**
 
-  *1.1- Qual é a pergunta geral do artigo?*
+## **1. Artigo, pergunta e unidade de análise**
 
-  *1.2- Qual é a unidade de análise da base?*
+**1.1- Qual é a pergunta geral do artigo?**
 
-  *1.3- O que significa uma linha da base?*
+Nas palavras de Nayara Albrecht e Pedro Ribeiro (2025, p. 2): "O estudo analisou em que medida os perfis dos/as nomeados/as variaram em órgãos responsáveis por políticas regulatórias", mais especificamente o MAPA e o MinC.
 
-  *1.4- Por que a mesma pessoa pode aparecer mais de uma vez?*
+**1.2- Qual é a unidade de análise da base?**
 
-  *1.5- Quais são as duas pastas comparadas no artigo?*
+O estudo toma a nomeação para cargo público como unidade de análise.
 
-**2. Leitura e validação dos dados**
+**1.3- O que significa uma linha da base?**
 
-  *2.1- Número de linhas e colunas.*
+Cada linha da base corresponde a uma nomeação específica de um indivíduo para um cargo em uma das pastas analisadas.
+
+**1.4- Por que a mesma pessoa pode aparecer mais de uma vez?**
+
+A mesma pessoa pode aparecer mais de uma vez se ela foi nomeada mais de uma vez para cargo pertencente a uma das pastas analisadas no período observado.
+
+**1.5- Quais são as duas pastas comparadas no artigo?**
+
+Ministério da Agricultura (MAPA) e Ministério da Cultura (MinC).
+
+## **2. Leitura e validação dos dados**
+
+**2.1- Número de linhas e colunas.**
+  
+```{r}
+dim(dados)
+```
+
+**2.2- Nomes das variáveis.**
+
+```{r}
+names(dados)
+```
+
+**2.3- Número de observações por orgao_sup.**
+
+```{r}
+table(dados$orgao_sup)
+```
+  
+**2.4- Número de valores ausentes em pelo menos cinco variáveis relevantes.**
+
+```{r}
+sum(is.na(dados$exp_adm))
+sum(is.na(dados$exp_car))
+sum(is.na(dados$nivel))
+sum(is.na(dados$instr))
+sum(is.na(dados$indicacao))
+```
+  
+**2.5- Uma checagem dos valores observados em exp_adm, exp_car, nivel, instr e indicacao.**
+
+*Checagem da variável exp_adm:*
+
+```{r}
+table(dados$exp_adm)
+```
+
+Erro:
+Nessa variável binária, cujos resultados esperados eram 0 e 1, aparecem, além dos valores esperados, os valores: "1" (3 vezes); "3" (1 vez); "NA" (11 vezes). O valor "NA" provavelmente foi colocado onde havia valor ausente. O valor "`1" provavelmente é um "1" digitado de forma equivocada e o valor "3" é um erro para o qual não tenho hipótese.
+
+Correção:
+Transformar "`1" em "1", e "NA" e "3" em valores ausentes.
+```{r}
+dados <- dados %>%
+  mutate(exp_adm = case_when(
+    exp_adm == "`1" ~ "1",
+    exp_adm == "3" ~ NA_character_,
+    exp_adm == "NA" ~ NA_character_,
+    TRUE ~ as.character(exp_adm)
+  ))
+
+dados$exp_adm <- as.numeric(dados$exp_adm)
+```
+
+
+*Checagem da variável exp_car:*
+
+```{r}
+table(dados$exp_car)
+```
+
+Erro:
+No artigo, é dito que os valores esperados, conforme nível do cargo ocupado, são: "nenhum = 0, níveis 1 e 2 = 1; níveis 3 e 4 = 2; níveis 5 e 6 = 5". Já na aba "Codebook" do banco de dados, é colocado que o valor atribuido para quem ocupou cargos de nível 5 e 6 é "3", não "5". Provavelmente, portanto, os valores "3" e "5" referem-se ao mesmo nível de cargo ocupado e, portanto, devem ser unificados. Já o valor "NA", assim como na variável anterior, provavelmente foi colocado onde havia valor ausente.
+
+Correção:
+Transformar "5" em "3", e "NA" em valores ausentes.
+```{r}
+dados <- dados %>%
+  mutate(exp_car = case_when(
+    exp_car == "5" ~ "3",
+    exp_car == "NA" ~ NA_character_,
+    TRUE ~ as.character(exp_car)
+  ))
+
+dados$exp_car <- as.numeric(dados$exp_car)
+```
+
+
+*Checagem da variável instr:*
+
+```{r}
+table(dados$instr)
+```
+
+Erro:
+Nessa variável aparece, além dos valores esperados, o valor NA", que provavelmente foi colocado onde havia valor ausente.
+
+Correção:
+Transformar "NA" em valores ausentes.
+```{r}
+dados <- dados %>%
+  mutate(instr = na_if(instr, "NA"))
+```
+
+
+*Checagem da variável nivel:*
+```{r}
+table(dados$nivel)
+```
+Não há valores inválidos.
+
+
+*Checagem da variável indicacao:*
+```{r}
+table(dados$indicacao)
+```
+Não há valores inválidos.
+
+## **3. Tabela descritiva: experiência administrativa**
+
+Primeiramente, criamos a variável exp_cp (experiência em cargos públicos) a partir das variáveis exp_adm e exp_car, uma vez que ambas indicam se o nomeado já participou de cargos públicos.
+A regra para a variável exp_cp é simples: se exp_adm *e* exp_car forem iguais a 0, exp_cp = 0; se exp_adm *ou* exp_car forem diferentes de 0, exp_cp = 1.
+
+```{r}
+dados <- dados %>%
+  mutate(exp_cp = case_when(
+    is.na(exp_adm) | is.na(exp_car) ~ NA_real_,
+    exp_adm == 0 & exp_car == 0 ~ 0,
+    TRUE ~ 1
+  ))
+```
+
+Depois, filtramos a variável orgao_sup para que fiquem apenas os valores mapa e minc (excluindo, portanto, mcti).
+
+```{r}
+dados <- dados %>%
+  filter(orgao_sup %in% c("mapa", "minc"))
+```
+
+Então, criamos uma tabela com: número total de nomeados de cada pasta; número de nomeados com experiência prévia em cargos públicos (exp_cp = 1); proporção de nomeados com experiência em cargos públicos.
+
+```{r}
+tabela_exp <- dados %>%
+  group_by(orgao_sup) %>%
+  summarise(
+    total = sum(!is.na(exp_cp)),
+    com_experiencia = sum(exp_cp == 1, na.rm = TRUE),
+    proporcao = mean(exp_cp, na.rm = TRUE)
+  )
+```
+
+A partir da tabela, calculamos os intervalos de confiança para a proporção de nomeações do MAPA e MinC com experiência em cargo público.
+
+  *MAPA*
+```{r}
+mapa_3 <- tabela_exp %>% filter(orgao_sup == "mapa")
+res_mapa_3 <- prop.test(mapa_3$com_experiencia, mapa_3$total)
+```
+
+  *Minc*
+```{r}
+minc_3 <- tabela_exp %>% filter(orgao_sup == "minc")
+res_minc_3 <- prop.test(minc_3$com_experiencia, minc_3$total)
+```
+
+Então, adicionamos na tabela os limites inferior e superior dos intervalos de confiança.
+
+```{r}
+tabela_exp$IC_inf <- c(res_mapa_3$conf.int[1], res_minc_3$conf.int[1])
+tabela_exp$IC_sup <- c(res_mapa_3$conf.int[2], res_minc_3$conf.int[2])
+```
+
+Por fim, adicionamos a margem de erro associada aos intervalos de confiança na tabela.
+
+```{r}
+tabela_exp$margem_erro <- (tabela_exp$IC_sup - tabela_exp$IC_inf) / 2
+```
+
+Com  isso, concluímos a elaboração da tabela, conforme solicitado pelo bloco 3.
+
+Tabela 1 – Proporção de nomeações com experiência administrativa por ministério
+```{r}
+tabela_exp
+```
+
+Essa tabela mostra que a proporção de nomeações com experiência em cargos públicos é aproximadamente 91,8% no MAPA e 87,4% no MinC.
+Para a proporção do MAPA (91,8%), o intervalo de confiança de 95% varia entre 88,9% e 94% (em valores aproximados) e a margem de erro é de aproximadamente 2,5%.
+Para a proporção do MinC (87,4%), o intervalo de confiança de 95% varia entre 83,2% e 90,7% (em valores aproximados) e a margem de erro é de aproximadamente 3,8%.
+O intervalo de confiança significa que, se o processo de amostragem fosse repetido diversas vezes, 95% dos intervalos construídos conteriam o valor real da proporção.Já a margem de erro indica que o valor das estimativas podem variar para mais ou para menos o valor da margem de erro.
+
+## **4. Primeiro teste de hipótese bivariado**
+
+**4.1 Hipótese nula.**
+
+H0: proporção de nomeações de indivíduos com experiência prévia em cargos públicos é igual entre os nomeados para MAPA e MinC.
+
+**4.2 Hipótese alternativa.** 
+
+H1: proporção de nomeações de indivíduos com experiência prévia em cargos públicos é diferente entre os nomeados para MAPA e MinC.
+
+**4.3 Teste usado no R.**
+
+```{r}
+prop.test(
+  x = c(457, 284),
+  n = c(498, 325)
+)
+```
+
+**4.4 P-valor.**
+
+p-value = 0.05325
+
+**4.5 Decisão usando nível de significância de 5%.**
+
+Dado que o p-valor é maior que 0,05, não se rejeita H0.
+
+**4.6 Interpretação substantiva.**
+
+A diferença nas proporções de nomeações de indivíduos com experiência prévia em cargos públicos no MAPA e MinC não é estatisticamente significativa.
+
+## 5. **Segundo teste de hipótese bivariado**
+
+Para executar as tarefas desse bloco de questões, criamos a variável alto_nivel, conforme instruções do trabalho.
+
+```{r}
+dados <- dados %>%
+  mutate(alto_nivel = case_when(
+    nivel == 4 ~ 0,
+    nivel %in% c(5, 6) ~ 1
+  ))
+```
+
+**5.1 Uma tabela com as proporções por pasta.**
+
+```{r}
+tabela_alto <- dados %>%
+  group_by(orgao_sup) %>%
+  summarise(
+    total = sum(!is.na(alto_nivel)),
+    alto = sum(alto_nivel == 1, na.rm = TRUE),
+    proporcao = mean(alto_nivel, na.rm = TRUE)
+  )
+```
+
+Tabela 2 - Proporção de nomeações para cargos de alto nível por ministério
+```{r}
+tabela_alto
+```
+
+**5.2 Um intervalo de confiança de 95% para cada proporção.**
+
+  *MAPA*
+```{r}
+mapa_5 <- tabela_alto %>% filter(orgao_sup == "mapa")
+prop.test(mapa_5$alto, mapa_5$total)
+```
+
+  *MinC*
+```{r}
+minc_5 <- tabela_alto %>% filter(orgao_sup == "minc")
+prop.test(minc_5$alto, minc_5$total)
+```
+
+**5.3 Um teste de hipótese para a diferença entre as proporções.**
+
+H0: proporção de nomeações de indivíduos para cargos de alto nível é igual entre os nomeados para MAPA e MinC.
+H1: proporção de nomeações de indivíduos para cargos de alto nível é diferente entre os nomeados para MAPA e MinC.
+
+```{r}
+prop.test(
+  x = c(187, 155),
+  n = c(525, 365)
+)
+```
+
+
+**5.4 O p-valor e sua interpretação.**
+
+p-value = 0.04601
+Hipótese H0 é rejeitada. Em outras palavras, a proporção de nomeações para cargos de alto nível no MAPA e MinC não é igual, pois a diferença entre as proporções é estatisticamente significativa.
+
+**5.5 Uma conclusão substantiva: a diferença parece grande, pequena ou irrelevante do ponto de vista substantivo?**
+
+Proporção de nomeações para cargos de alto nível é maior no MinC (42,47%) do que no MAPA (35,62%). A diferença entre as proporções não parece grande, mas também não é irrelevante, dado sua significância estatísitica.
+
+## **6. Significância estatística e nível de significância**
+
+Para responder às perguntas desse bloco, escolhemos o teste feito no bloco 5, acerca das proporções relativas a nomeações para cargos de alto nível, cujo p-valor foi igual a 0.04601.
+
+**6.1- A conclusão mudaria se o nível de significância fosse 10%?**
+
+Caso o nível de significância fosse 10%, a conclusão não mudaria: continuaríamos rejeitando H0 pois o p-valor ainda seria menor que o nível de significância (0,04601 < 0,10).
+
+**6.2- A conclusão mudaria se o nível de significância fosse 1%?**
+
+Caso o nível de significância fosse 1%, a conclusão mudaria: não rejeitariamos H0 pois o p-valor passaria a ser maior que o nível de significância (0,04601 > 0,01).
+
+**6.3-  O que esse exercício mostra sobre a diferença entre p-valor e significância substantiva?**
+
+Esse exercicio mostra que o p-valor pode indicar ou não significância substantiva a depender do nível de significância utilizado como critério. Quanto menor o nível de significância, maior deve ser a força da evidência encontrada no teste para que a hipótese nula seja rejeitada.
+
+## **7. O que aconteceria se a amostra fosse maior?**
+
+Para responder às perguntas desse bloco, escolhemos o teste feito no bloco 5, acerca das proporções relativas a nomeações para cargos de alto nível, em que as proporções estimadas foram 0.3561905 para o MAPA e 0.4246575 para o MinC.
+
+**7.1- O que tenderia a acontecer com o erro-padrão?**
+
+O erro-padrão diminuiria.
+
+**7.2- Por que isso acontece?**
+
+A fórmula do erro-padrão é:
+$$
+EP = \sqrt{\frac{p(1-p)}{n}}
+$$
+Dado que n é o denominador da fórmula, quando n aumenta, o erro-padrão diminui.
+
+Vejamos como isso se manifesta no erro-padrão da proporção de nomeações para cargo de alto nível para o MinC (proporção = 0.4246575; n = 365):
+
+```{r}
+sqrt(0.4246575 * (1 - 0.4246575) / 365)
+```
+
+Agora, mantendo a proporção e dobrando o valor de n (365 * 2 = 730), o erro-padrão muda para:
+
+```{r}
+sqrt(0.4246575 * (1 - 0.4246575) / 730)
+```
+
+
+# **PERGUNTAS EXCLUSIVAS PARA PÓS-GRADUAÇÃO**
+
+
+## **P1- Unidade de análise: nomeação ou indivíduo?**
+
+Para realizar esse bloco de exercícios, construímos uma versão da base com uma linha por id. Nos casos em que há mais de uma nomeação por id, optamos por manter apenas a nomeação mais recente de cada indivíduo.
+
+```{r}
+dados_id <- dados %>%
+  group_by(id) %>%
+  slice_max(order_by = entrada, n = 1, with_ties = FALSE) %>%
+  ungroup()
+```
+
+Para esse bloco de exercícios, escolhemos repetir o teste do Bloco 5.
+
+Primeiro, criamos uma tabela com número de indivíduos por pasta, número de indivíduos nomeados para cargos de alto nível e proporção de indivíduos nomeados para cargos de alto nível.
+
+```{r}
+tabela_id <- dados_id %>%
+  group_by(orgao_sup) %>%
+  summarise(
+    total = sum(!is.na(alto_nivel)),
+    alto = sum(alto_nivel == 1, na.rm = TRUE),
+    proporcao = mean(alto_nivel, na.rm = TRUE)
+  )
+```
+
+Tabela 3 - Proporção de indivíduos nomeados para cargos de alto nível nos ministérios
+```{r}
+tabela_id
+```
+
+Depois, realizamos o teste de hipótese a partir dos valores extraídos da tabela:
+
+```{r}
+prop.test(
+  x = c(124, 123),
+  n = c(314, 254)
+)
+```
+
+O p-valor obtido no teste com a base de dados que tem o indivíduo como unidade de análise (0.04031) foi inferior ao p-valor do teste de hipótese conduzido com a base de dados que tinha como a nomeação como unidade de análise (0.04601).
+
+**P1.1- O resultado muda quando a unidade passa de nomeação para indivíduo?**
+
+O resultado do p-valor muda, mas o resultado do teste a nível de significância de 5% não muda, uma vez que ambos os p-valor são inferiores a 0,05. Ou seja, em ambas os testes, rejeita-se H0 e, portanto, a diferença entre proporções é estatisticamente significativa.
+
+**P1.2- Qual unidade de análise é mais adequada para a pergunta que você está respondendo?**
+
+Dado que o estudo avalia "em que medida os perfis dos/as nomeados/as variaram em órgãos responsáveis por políticas regulatórias"
