@@ -213,7 +213,7 @@ prop.test(
 #Exercício feito também com base nas informações do teste de hipótese do  Bloco 5.
 #Intervalo de confiança para a diferença de proporções entre nomeações para cargos de alto nível no MAPA e MinC:
 prop.test(
-  x = c(155, 187),   # MinC, MAPA (ordem importa!)
+  x = c(155, 187),   
   n = c(365, 525)
 )
    #Intervalo de confiança não inclui o 0 (valor inferior = 0.0009578958).

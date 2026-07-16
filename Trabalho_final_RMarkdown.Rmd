@@ -434,4 +434,17 @@ O resultado do p-valor muda, mas o resultado do teste a nível de significância
 
 **P1.2- Qual unidade de análise é mais adequada para a pergunta que você está respondendo?**
 
-Dado que o estudo avalia "em que medida os perfis dos/as nomeados/as variaram em órgãos responsáveis por políticas regulatórias"
+Dado que o estudo avalia mudanças no *perfil de nomeação* para as pastas, a unidade de análise mais adequada é a nomeação.
+
+## **P2. Intervalo de confiança para diferença de proporções**
+
+Para esse bloco de exercícios, escolhemos calcular a diferença entre as proporções calculadas no Bloco 5 (proporções de nomeações para cargos de alto nível).
+
+```{r}
+prop.test(
+  x = c(155, 187),   
+  n = c(365, 525)
+)
+```
+
+O intervalo de confiança de 95% entre 0,09% e 13% indica que a diferença real entre as proporções provavelmente está nesse intervalo. Dado que o intervalo não inclui o zero, há evidência estatisticamente significativa de que as proporções são diferentes.
