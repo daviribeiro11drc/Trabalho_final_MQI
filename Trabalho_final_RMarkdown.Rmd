@@ -20,7 +20,7 @@ Para a realização do trabalho, foi criado um repositório no GitHub, que pode 
 
 Executei os códigos sugeridos para utilização dos pacotes:
 
-```{r, eval=FALSE}
+```{r}
 library(readxl)
 library(dplyr)
 library(ggplot2)
@@ -33,7 +33,7 @@ Adicionei a base de dados na pasta do repositório criado para o projeto.
 
 Por fim, transformei a aba "BASE_cargos" do banco de dados no objeto "dados":
 
-```{r, eval=FALSE}
+```{r}
 dados <- read_excel("BASE_cargos2.xlsx", sheet = "BASE_cargos")
 ```
 
