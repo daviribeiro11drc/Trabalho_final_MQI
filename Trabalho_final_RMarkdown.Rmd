@@ -170,7 +170,7 @@ Não há valores inválidos.
 
 ## **3. Tabela descritiva: experiência administrativa**
 
-Primeiramente, criamos a variável exp_cp (experiência em cargos públicos) a partir das variáveis exp_adm e exp_car, uma vez que ambas indicam se o nomeado já participou de cargos públicos.
+Primeiramente, criamos a variável exp_cp (experiência em cargos públicos) a partir das variáveis exp_adm e exp_car, uma vez que ambas indicam se o nomeado já participou de cargos públicos: exp_adm refere-se à experiência em órgãos da administração pública e exp_car refere-se à experiência em cargos DAS e FCPE na hierarquia pública.
 A regra para a variável exp_cp é simples: se exp_adm *e* exp_car forem iguais a 0, exp_cp = 0; se exp_adm *ou* exp_car forem diferentes de 0, exp_cp = 1.
 
 ```{r}
