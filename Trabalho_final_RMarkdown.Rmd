@@ -25,12 +25,12 @@ library(ggplot2)
 Baixei a base de dados "BASE_cargos2.xlsx" a partir do link: https://raw.githubusercontent.com/nayalbrecht/burocraciaBR/main/BASE_cargos2.xlsx
 O link foi acessado em 14/07/2026.
 
-Adicionei a base de dados na pasta do repositório criado para o projeto.
+Adicionei a base de dados na pasta "dados",  dentro da pasta do repositório criado para o projeto.
 
-Por fim, transformei a aba "BASE_cargos" do banco de dados no objeto "dados":
+Por fim, li a base de dados e transformei a aba "BASE_cargos" no objeto "dados":
 
 ```{r}
-dados <- read_excel("BASE_cargos2.xlsx", sheet = "BASE_cargos")
+dados <- readxl::read_excel("dados/BASE_cargos2.xlsx", sheet = "BASE_cargos")
 ```
 
 # **PERGUNTAS OBRIGATÓRIAS**
@@ -98,10 +98,10 @@ table(dados$exp_adm)
 ```
 
 Erro:
-Nessa variável binária, cujos resultados esperados eram 0 e 1, aparecem, além dos valores esperados, os valores: "`1" (3 vezes); "3" (1 vez); "NA" (11 vezes). O valor "NA" provavelmente foi colocado onde havia valor ausente. O valor "`1" provavelmente é um "1" digitado de forma equivocada e o valor "3" é um erro para o qual não tenho hipótese.
+Nessa variável binária, cujos resultados esperados eram 0 e 1, aparecem, além dos valores esperados, os valores: " `1" (3 vezes); "3" (1 vez); "NA" (11 vezes). O valor "NA" provavelmente foi colocado onde havia valor ausente. O valor " `1" provavelmente é um "1" digitado de forma equivocada e o valor "3" é um erro para o qual não tenho hipótese.
 
 Correção:
-Transformar "`1" em "1", e "NA" e "3" em valores ausentes.
+Transformar " `1" em "1", e "NA" e "3" em valores ausentes.
 ```{r}
 dados <- dados %>%
   mutate(exp_adm = case_when(
