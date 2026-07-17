@@ -231,8 +231,7 @@ tabela_exp$margem_erro <- (tabela_exp$IC_sup - tabela_exp$IC_inf) / 2
 Com  isso, concluímos a elaboração da tabela, conforme solicitado pelo bloco 3.
 
 ```{r}
-tabela_exp
-#Tabela 1 – Proporção de nomeações com experiência administrativa por ministério
+tabela_exp #Tabela 1 – Proporção de nomeações com experiência administrativa por ministério
 ```
 
 Essa tabela mostra que a proporção de nomeações com experiência em cargos públicos é aproximadamente 91,8% no MAPA e 87,4% no MinC.
@@ -296,8 +295,7 @@ tabela_alto <- dados %>%
 ```
 
 ```{r}
-tabela_alto
-#Tabela 2 - Proporção de nomeações para cargos de alto nível por ministério
+tabela_alto #Tabela 2 - Proporção de nomeações para cargos de alto nível por ministério
 ```
 
 **5.2 Um intervalo de confiança de 95% para cada proporção.**
@@ -411,8 +409,7 @@ tabela_id <- dados_id %>%
 ```
 
 ```{r}
-tabela_id
-#Tabela 3 - Proporção de indivíduos nomeados para cargos de alto nível nos ministérios
+tabela_id #Tabela 3 - Proporção de indivíduos nomeados para cargos de alto nível nos ministérios
 ```
 
 Depois, realizamos o teste de hipótese a partir dos valores extraídos da tabela:
