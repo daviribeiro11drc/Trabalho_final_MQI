@@ -442,4 +442,4 @@ prop.test(
 )
 ```
 
-O intervalo de confiança de 95% entre 0,09% e 13,6% indica que a diferença real entre as proporções provavelmente está nesse intervalo. Dado que o intervalo não inclui o zero, há evidência estatisticamente significativa de que as proporções são diferentes.
+O intervalo de confiança, construído entre 0,09% e 13%, indica que é altamente provável que a diferença real entre as proporções esteja nesse intervalo, para o nível de significância de 95%. Dado que o intervalo não inclui o zero, há evidência estatisticamente significativa de que as proporções são diferentes.
